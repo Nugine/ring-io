@@ -4,3 +4,5 @@
 compile_error!("ring-io does not support this target");
 
 pub mod sys;
+
+mod utils;
