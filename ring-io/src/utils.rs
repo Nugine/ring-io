@@ -1,14 +1,14 @@
 #![allow(dead_code)]
 
-use std::io;
 use std::mem::ManuallyDrop;
 use std::ptr::NonNull;
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::{io, mem};
 
 // -----------------------------------------------------------------------------
 
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct KU32Ptr(NonNull<AtomicU32>);
 
 impl KU32Ptr {
@@ -20,6 +20,7 @@ impl KU32Ptr {
 // -----------------------------------------------------------------------------
 
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct ReadOnlyPtr<T: Copy>(NonNull<T>);
 
 impl<T: Copy> Clone for ReadOnlyPtr<T> {
@@ -116,6 +117,7 @@ impl<F: FnOnce() -> T, T> Guard<F, T> {
     pub fn cancel(mut self) {
         let f = unsafe { ManuallyDrop::take(&mut self.0) };
         drop(f);
+        mem::forget(self);
     }
 }
 
