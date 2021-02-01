@@ -12,9 +12,11 @@ mod cqe;
 mod reg;
 mod ring;
 mod sq;
+mod sqe;
 
 pub use self::cq::CompletionQueue;
 pub use self::cqe::CQE;
 pub use self::reg::Registrar;
 pub use self::ring::{Ring, RingBuilder};
 pub use self::sq::SubmissionQueue;
+pub use self::sqe::{PrepareSQE, SQE};
