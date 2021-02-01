@@ -114,6 +114,10 @@ impl Ring {
         self.cq.kring_entries.read()
     }
 
+    pub fn features(&self) -> FeatureFlags {
+        self.features
+    }
+
     pub fn split(self) -> (SubmissionQueue, CompletionQueue, Registrar) {
         let ring = Arc::new(self);
         unsafe {
@@ -140,64 +144,6 @@ impl Ring {
         }
         Ok(ret)
     }
-
-    // /// # Safety
-    // /// The buffers must be valid until they are unregistered or the ring is dropped.
-    // pub unsafe fn register_buffers(
-    //     &self,
-    //     iovecs: *const libc::iovec,
-    //     n_vecs: usize,
-    // ) -> io::Result<()> {
-    //     libc_call(|| {
-    //         sys::io_uring_register(
-    //             self.ring_fd,
-    //             RegisterOp::RegisterBuffers as u32,
-    //             iovecs.cast(),
-    //             n_vecs as u32,
-    //         )
-    //     })?;
-    //     Ok(())
-    // }
-
-    // pub fn unregister_buffers(&self) -> io::Result<()> {
-    //     libc_call(|| unsafe {
-    //         sys::io_uring_register(
-    //             self.ring_fd,
-    //             RegisterOp::UnregisterBuffers as u32,
-    //             ptr::null(),
-    //             0,
-    //         )
-    //     })?;
-    //     Ok(())
-    // }
-
-    // /// # Safety
-    // /// The files must not be closed until they are unregistered or the ring is dropped.
-    // pub unsafe fn register_files(&self, files: &[RawFd]) -> io::Result<()> {
-    //     libc_call(|| {
-    //         let files_ptr = files.as_ptr();
-    //         let nr_files = files.len() as u32;
-    //         sys::io_uring_register(
-    //             self.ring_fd,
-    //             RegisterOp::RegisterFiles as u32,
-    //             files_ptr.cast(),
-    //             nr_files,
-    //         )
-    //     })?;
-    //     Ok(())
-    // }
-
-    // pub fn unregister_files(&self) -> io::Result<()> {
-    //     libc_call(|| unsafe {
-    //         sys::io_uring_register(
-    //             self.ring_fd,
-    //             RegisterOp::UnregisterFiles as u32,
-    //             ptr::null(),
-    //             0,
-    //         )
-    //     })?;
-    //     Ok(())
-    // }
 }
 
 const U32_SIZE: usize = mem::size_of::<u32>();
