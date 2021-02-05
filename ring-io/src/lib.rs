@@ -3,7 +3,7 @@
 #[cfg(target_pointer_width = "16")]
 compile_error!("ring-io does not support this target");
 
-mod sys;
+pub mod sys;
 
 mod utils;
 

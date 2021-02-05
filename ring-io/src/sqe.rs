@@ -20,16 +20,19 @@ impl fmt::Debug for SQE {
 }
 
 impl SQE {
-    pub fn set_flags(&mut self, flags: SQEFlags) {
-        self.sqe.set_flags(flags)
+    pub fn set_flags(&mut self, flags: SQEFlags) -> &mut Self {
+        self.sqe.set_flags(flags);
+        self
     }
 
-    pub fn enable_flags(&mut self, flags: SQEFlags) {
-        self.sqe.enable_flags(flags)
+    pub fn enable_flags(&mut self, flags: SQEFlags) -> &mut Self {
+        self.sqe.enable_flags(flags);
+        self
     }
 
-    pub fn set_user_data(&mut self, user_data: u64) {
-        self.sqe.set_user_data(user_data)
+    pub fn set_user_data(&mut self, user_data: u64) -> &mut Self {
+        self.sqe.set_user_data(user_data);
+        self
     }
 }
 
