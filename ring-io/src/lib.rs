@@ -8,11 +8,13 @@ mod sys;
 mod utils;
 
 mod cq;
+mod cqe;
 mod reg;
 mod ring;
 mod sq;
 
 pub use self::cq::CompletionQueue;
+pub use self::cqe::CQE;
 pub use self::reg::Registrar;
 pub use self::ring::{Ring, RingBuilder};
 pub use self::sq::SubmissionQueue;
