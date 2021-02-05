@@ -12,3 +12,7 @@ path = "../ring-io"
 version = "0.0.3-pure-dev"
 
 [dependencies]
+aligned-utils = "1.0.1"
+anyhow = "1.0.38"
+structopt = "0.3.21"
+libc = "0.2.85"
