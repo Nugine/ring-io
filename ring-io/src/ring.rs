@@ -54,9 +54,11 @@ pub(crate) struct RingSq {
     pub array: RawArrayPtr<u32>,
     pub sqes: RawArrayPtr<RawSQE>,
 
-    // ring-io custom fields
     pub rhead: CachePadded<AtomicU32>,
     pub rtail: CachePadded<AtomicU32>,
+
+    pub pop_lock: CachePadded<Mutex<()>>,
+    pub push_lock: CachePadded<Mutex<()>>,
 }
 
 #[repr(C)]
@@ -208,6 +210,8 @@ unsafe fn ring_new_sq(sq_mmap: *mut (), sq_off: &RawSqOffsets, sqe_mmap: *mut ()
         sqes: RawArrayPtr::new_unchecked(sqe_mmap.cast::<RawSQE>()),
         rhead: CachePadded::new(AtomicU32::new(rhead)),
         rtail: CachePadded::new(AtomicU32::new(rtail)),
+        pop_lock: CachePadded::new(Mutex::new(())),
+        push_lock: CachePadded::new(Mutex::new(())),
     }
 }
 
