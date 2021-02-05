@@ -13,6 +13,7 @@ use std::sync::Arc;
 use std::{fmt, io, mem, ptr};
 
 use crossbeam_utils::CachePadded;
+use parking_lot::Mutex;
 
 pub struct RingBuilder {
     entries: u32,
@@ -68,8 +69,7 @@ pub(crate) struct RingCq {
     pub kflags: Option<KU32Ptr>,
     pub cqes: RawArrayPtr<RawCQE>,
 
-    // ring-io custom fields
-    pub rhead: CachePadded<AtomicU32>,
+    pub pop_lock: Mutex<()>,
 }
 
 impl fmt::Debug for Ring {
@@ -231,7 +231,7 @@ unsafe fn ring_new_cq(cq_mmap: *mut (), cq_off: &RawCqOffsets) -> RingCq {
         koverflow: KU32Ptr::new_unchecked(mmap_offset_mut(cq_mmap, cq_off.overflow)),
         kflags,
         cqes: RawArrayPtr::new_unchecked(mmap_offset_mut(cq_mmap, cq_off.cqes)),
-        rhead: CachePadded::new(AtomicU32::new(khead.unsync_load())),
+        pop_lock: Mutex::new(()),
     }
 }
 
