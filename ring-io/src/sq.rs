@@ -178,20 +178,26 @@ unsafe fn submit_and_wait(ring: &Ring, n_wait: u32) -> Result<u32, Errno> {
 
     fence(AcqRel);
 
+    let mut needs_enter = false;
     let mut enter_flags = EnterFlags::empty();
-    let needs_enter = if ring.setup_flags.contains(SetupFlags::SQPOLL) {
+
+    if ring.setup_flags.contains(SetupFlags::SQPOLL) {
         let kflags = sq.kflags.load_relaxed();
-        if kflags & SQFlags::NEED_WAKEUP.bits() != 0 {
+        let needs_wakeup = kflags & SQFlags::NEED_WAKEUP.bits() != 0;
+        if needs_wakeup {
+            needs_enter = true;
             enter_flags |= EnterFlags::SQ_WAKEUP;
-            true
-        } else {
-            false
         }
     } else {
-        true
-    };
+        needs_enter = true;
+    }
 
-    if n_wait > 0 || needs_enter {
+    if n_wait > 0 {
+        needs_enter = true;
+        enter_flags |= EnterFlags::GETEVENTS;
+    }
+
+    if needs_enter {
         let ret = ring.enter::<()>(to_submit, n_wait, enter_flags, None)?;
         Ok(ret as u32)
     } else {

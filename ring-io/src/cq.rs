@@ -102,7 +102,9 @@ impl CompletionQueue {
             let khead = cq.khead.load_relaxed();
             let ready = ktail.wrapping_sub(khead);
             if ready > 0 {
-                Some(cq.cqes.get_raw(khead & cq.kring_mask).cast::<CQE>().read())
+                let cqe = cq.cqes.get_raw(khead & cq.kring_mask).cast::<CQE>().read();
+                cq.khead.store_release(khead.wrapping_add(1));
+                Some(cqe)
             } else {
                 None
             }
