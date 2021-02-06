@@ -50,7 +50,7 @@ fn run(args: Args) -> Result<()> {
     let (mut sq, mut cq, _) = {
         let on_err = || format!("failed to build a ring: entries = {}", RING_ENTRIES);
         Ring::with_entries(RING_ENTRIES)
-            .setup()
+            .build()
             .with_context(on_err)?
             .split()
     };

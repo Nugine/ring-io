@@ -6,7 +6,7 @@ use std::ptr;
 
 #[test]
 fn t03_01_readv() {
-    let ring = Ring::with_entries(32).setup().unwrap();
+    let ring = Ring::with_entries(32).build().unwrap();
     let (mut sq, mut cq, _) = ring.split();
 
     assert_eq!(sq.available(), 32);

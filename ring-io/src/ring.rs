@@ -93,7 +93,7 @@ impl fmt::Debug for RingBuilder {
 }
 
 impl RingBuilder {
-    pub fn setup(mut self) -> io::Result<Ring> {
+    pub fn build(mut self) -> io::Result<Ring> {
         unsafe { ring_setup_with_params(self.entries, &mut self.params).map_err(From::from) }
     }
 }

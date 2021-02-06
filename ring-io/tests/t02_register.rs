@@ -5,7 +5,7 @@ use std::os::unix::io::AsRawFd;
 
 #[test]
 fn t02_01_register_file() {
-    let ring = Ring::with_entries(32).setup().unwrap();
+    let ring = Ring::with_entries(32).build().unwrap();
 
     let file = File::open("Cargo.toml").unwrap();
 
@@ -19,7 +19,7 @@ fn t02_01_register_file() {
 
 #[test]
 fn t02_02_register_buffer() {
-    let ring = Ring::with_entries(32).setup().unwrap();
+    let ring = Ring::with_entries(32).build().unwrap();
 
     let mut buf: Vec<u8> = vec![0; 1024];
 
