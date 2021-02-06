@@ -189,7 +189,7 @@ unsafe fn submit_and_wait(ring: &Ring, n_wait: u32) -> Result<u32, Errno> {
             enter_flags |= EnterFlags::SQ_WAKEUP;
         }
     } else {
-        needs_enter = true;
+        needs_enter = to_submit > 0;
     }
 
     if n_wait > 0 {
