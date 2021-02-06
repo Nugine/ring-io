@@ -2,9 +2,11 @@ on:
   push:
     branches:
       - main
+      - pure
   pull_request:
     branches:
       - main
+      - pure
 
 name: CI
 
