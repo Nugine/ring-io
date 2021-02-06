@@ -62,6 +62,12 @@ impl SubmissionQueue {
         unsafe { pop_sqe(sq) }
     }
 
+    pub fn sync_pop_sqe(&self) -> Option<SQEIndex> {
+        let sq = &self.ring.sq;
+        let _pop_guard = sq.pop_lock.lock();
+        unsafe { pop_sqe(sq) }
+    }
+
     pub fn pop_batch_sqe(&mut self, indices: &mut [MaybeUninit<SQEIndex>]) -> &[SQEIndex] {
         unsafe {
             let sq = &self.ring.sq;
@@ -86,6 +92,13 @@ impl SubmissionQueue {
     /// # Safety
     pub unsafe fn push_sqe(&mut self, index: SQEIndex) {
         let sq = &self.ring.sq;
+        push_sqe(sq, index.0)
+    }
+
+    /// # Safety
+    pub unsafe fn sync_push_sqe(&self, index: SQEIndex) {
+        let sq = &self.ring.sq;
+        let _push_guard = sq.push_lock.lock();
         push_sqe(sq, index.0)
     }
 

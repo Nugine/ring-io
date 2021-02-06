@@ -49,4 +49,8 @@ impl CQE {
     pub fn is_err(&self) -> bool {
         self.cqe.res < 0
     }
+
+    pub fn resultify(res: i32) -> io::Result<u32> {
+        resultify(res)
+    }
 }
