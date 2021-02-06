@@ -17,6 +17,10 @@ impl CompletionQueue {
         Self { ring }
     }
 
+    pub fn entries(&self) -> u32 {
+        self.ring.cq.kring_entries
+    }
+
     pub fn needs_flush(&self) -> bool {
         let sq = &self.ring.sq;
         let flags = sq.kflags.load_relaxed();
@@ -98,16 +102,15 @@ impl CompletionQueue {
     pub fn pop_cqe(&mut self) -> Option<CQE> {
         unsafe {
             let cq = &self.ring.cq;
-            let ktail = cq.ktail.load_acquire();
-            let khead = cq.khead.load_relaxed();
-            let ready = ktail.wrapping_sub(khead);
-            if ready > 0 {
-                let cqe = cq.cqes.get_raw(khead & cq.kring_mask).cast::<CQE>().read();
-                cq.khead.store_release(khead.wrapping_add(1));
-                Some(cqe)
-            } else {
-                None
-            }
+            pop_cqe(cq)
+        }
+    }
+
+    pub fn sync_pop_cqe(&self) -> Option<CQE> {
+        unsafe {
+            let cq = &self.ring.cq;
+            let _pop_guard = cq.pop_lock.lock();
+            pop_cqe(cq)
         }
     }
 
@@ -132,7 +135,7 @@ impl CompletionQueue {
         }
     }
 
-    pub fn wait_cqes(&mut self, count: u32) -> io::Result<u32> {
+    pub fn wait_cqes(&self, count: u32) -> io::Result<u32> {
         unsafe {
             let cq = &self.ring.cq;
 
@@ -152,6 +155,19 @@ impl CompletionQueue {
 
             Ok(ready)
         }
+    }
+}
+
+unsafe fn pop_cqe(cq: &RingCq) -> Option<CQE> {
+    let ktail = cq.ktail.load_acquire();
+    let khead = cq.khead.load_relaxed();
+    let ready = ktail.wrapping_sub(khead);
+    if ready > 0 {
+        let cqe = cq.cqes.get_raw(khead & cq.kring_mask).cast::<CQE>().read();
+        cq.khead.store_release(khead.wrapping_add(1));
+        Some(cqe)
+    } else {
+        None
     }
 }
 

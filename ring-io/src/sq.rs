@@ -24,6 +24,10 @@ impl SubmissionQueue {
         Self { ring }
     }
 
+    pub fn entries(&self) -> u32 {
+        self.ring.sq.kring_entries
+    }
+
     pub fn available(&self) -> u32 {
         let sq = &self.ring.sq;
         let khead = sq.khead.load_acquire();
